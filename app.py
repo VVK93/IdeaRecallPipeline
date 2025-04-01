@@ -63,14 +63,25 @@ def display_evaluation_results(eval_data):
 
     st.markdown("---") # Separator
 
+    # Generation Stage Results
+    gen_time = eval_data.get("generation_time", 0)
+    st.subheader(f"Generation Stage 🎯 ({gen_time:.1f}s)")
+    if eval_data.get("generator_error"):
+        st.error(f"Generation Failed: {eval_data.get('generator_error')}")
+    else:
+        st.success("Generation completed successfully")
+
+    st.markdown("---") # Separator
+
     # Stage 1 Results
-    st.subheader("Stage 1: Automated Checks")
+    stage1_time = eval_data.get("stage1_time", 0)
+    st.subheader(f"Stage 1: Automated Checks ⚡ ({stage1_time:.1f}s)")
     col1, col2, col3 = st.columns(3)
     with col1:
         format_check_data = eval_data.get("format_check", {})
         format_ok = format_check_data.get("passed", False)
         format_msg = format_check_data.get("message", 'N/A')
-        st.metric(label="JSON Format Check", value="PASS" if format_ok else "FAIL", delta_color="off",
+        st.metric(label="JSON Format Check", value=f"{'✅ PASS' if format_ok else '❌ FAIL'}", delta_color="off",
                   help=format_msg if not format_ok else None)
         if not format_ok:
             st.error(f"Reason: {format_msg}")
@@ -78,7 +89,7 @@ def display_evaluation_results(eval_data):
         length_check_data = eval_data.get("length_check", {})
         length_ok = length_check_data.get("passed", False)
         len_details = length_check_data.get("details", {})
-        st.metric(label="Length Check", value="PASS" if length_ok else "FAIL", delta_color="off")
+        st.metric(label="Length Check", value=f"{'✅ PASS' if length_ok else '❌ FAIL'}", delta_color="off")
         if not length_ok:
             if 'error' in len_details:
                  st.error(f"Reason: {len_details['error']}")
@@ -96,7 +107,7 @@ def display_evaluation_results(eval_data):
         bert_score = bert_score_data.get("score", None) # Use None to check if calculated
         bert_passed = bert_score_data.get("passed_threshold", False)
         bert_msg = bert_score_data.get("message","")
-        st.metric(label="BERTScore F1 (Sanity Check)", value=f"{bert_score:.3f}" if bert_score is not None else "N/A",
+        st.metric(label="BERTScore F1 (Sanity Check)", value=f"{'✅' if bert_passed else '❌'} {bert_score:.3f}" if bert_score is not None else "N/A",
                   help=f"Compares summary to transcript. Low score might indicate semantic detachment.\n{bert_msg}")
         if bert_score is not None:
             st.caption(f"Threshold: {config.BERTSCORE_THRESHOLD} - {'Passed' if bert_passed else 'Below Threshold'}")
@@ -109,7 +120,8 @@ def display_evaluation_results(eval_data):
     st.markdown("---") # Separator
 
     # Stage 2 Results
-    st.subheader("Stage 2: AI Judge Assessment")
+    stage2_time = eval_data.get("stage2_time", 0)
+    st.subheader(f"Stage 2: AI Judge Assessment 🤖 ({stage2_time:.1f}s)")
     ai_judge_results_data = eval_data.get("ai_judge_assessment", {})
     ai_judge_results = ai_judge_results_data.get("data")
     ai_judge_error = ai_judge_results_data.get("error")
@@ -131,7 +143,8 @@ def display_evaluation_results(eval_data):
             if inaccurate is None:
                  st.json({"Result": "N/A"})
             else:
-                 st.json({"Result": "Inaccurate" if inaccurate else "Accurate"})
+                result = "✅ Accurate" if not inaccurate else "❌ Inaccurate"
+                st.json({"Result": result})
             if inaccurate:
                 st.error(f"Explanation: {accuracy_data.get('explanation', 'None provided')}", icon="❗")
         # Completeness
@@ -139,7 +152,7 @@ def display_evaluation_results(eval_data):
         comp_target = config.COMPLETENESS_TARGET_SCORE
         with col_comp:
              st.markdown("**Completeness**")
-             st.metric("Score (AI)", f"{comp_score}/5" if comp_score else "N/A",
+             st.metric("Score (AI)", f"{'✅' if comp_score >= comp_target else '❌'} {comp_score}/5" if comp_score else "N/A",
                       delta=f"{comp_score - comp_target:.1f}" if isinstance(comp_score, (int, float)) else None,
                       delta_color="normal" if isinstance(comp_score, (int, float)) and comp_score >= comp_target else "inverse",
                       help=f"Target: ≥ {comp_target}")
@@ -148,7 +161,7 @@ def display_evaluation_results(eval_data):
         rel_target = config.RELEVANCE_TARGET_SCORE
         with col_rel:
              st.markdown("**Relevance**")
-             st.metric("Score (AI)", f"{rel_score}/5" if rel_score else "N/A",
+             st.metric("Score (AI)", f"{'✅' if rel_score >= rel_target else '❌'} {rel_score}/5" if rel_score else "N/A",
                       delta=f"{rel_score - rel_target:.1f}" if isinstance(rel_score, (int, float)) else None,
                       delta_color="normal" if isinstance(rel_score, (int, float)) and rel_score >= rel_target else "inverse",
                       help=f"Target: ≥ {rel_target}")
@@ -157,7 +170,7 @@ def display_evaluation_results(eval_data):
         clar_target = config.CLARITY_TARGET_SCORE
         with col_clar:
             st.markdown("**Clarity**")
-            st.metric("Score (AI)", f"{clar_score}/5" if clar_score else "N/A",
+            st.metric("Score (AI)", f"{'✅' if clar_score >= clar_target else '❌'} {clar_score}/5" if clar_score else "N/A",
                      delta=f"{clar_score - clar_target:.1f}" if isinstance(clar_score, (int, float)) else None,
                      delta_color="normal" if isinstance(clar_score, (int, float)) and clar_score >= clar_target else "inverse",
                      help=f"Target: ≥ {clar_target}")
@@ -171,11 +184,11 @@ def display_evaluation_results(eval_data):
     st.markdown("---") # Separator
 
     # Stage 3 Results
-    st.subheader("Stage 3: Human Feedback (Utility)")
+    st.subheader(f"Stage 3: Human Feedback (Utility) 👤")
     user_rating = eval_data.get("user_utility_rating")
     util_target = config.UTILITY_TARGET_SCORE
     if user_rating:
-        st.metric("User Utility Rating", f"{user_rating}/5",
+        st.metric("User Utility Rating", f"{'✅' if user_rating >= util_target else '❌'} {user_rating}/5",
                    delta=f"{user_rating - util_target:.1f}" if isinstance(user_rating, (int, float)) else None,
                    delta_color="normal" if isinstance(user_rating, (int, float)) and user_rating >= util_target else "inverse",
                    help=f"Target: ≥ {util_target}")
@@ -259,6 +272,7 @@ if run_button:
     try:
         # --- Generation Stage ---
         logger.info("Initiating Generation Stage.")
+        gen_start_time = time.time()
         with processing_placeholder: # Show status within the placeholder
              with st.spinner(f"Running Pipeline... Calling Generator ({config.GENERATOR_MODEL_ID})..."):
                 generated_json_str, gen_error = llm_interface.call_generator_llm(transcript_input)
@@ -266,6 +280,8 @@ if run_button:
                 current_eval_data["generator_error"] = gen_error
                 logger.debug(f"Generator Raw Response Snippet: {generated_json_str[:200] if generated_json_str else 'None'}...")
                 if gen_error: logger.error(f"Generator Error Occurred: {gen_error}")
+        gen_time = time.time() - gen_start_time
+        evaluation_results["generation_time"] = gen_time
 
         if gen_error or not generated_json_str:
             error_msg = gen_error or "Empty response from Generator LLM."
@@ -298,17 +314,13 @@ if run_button:
         else:
             current_eval_data["generated_data"] = {"error": "Invalid JSON"}
             logger.error(f"Generated output failed format check: {format_msg}")
-            # Potentially stop here if format is critical for next steps
-            # st.error(f"Format Check Failed: {format_msg}")
-            # st.code(generated_json_str, language='text')
-            # st.stop()
-
 
         # --- Evaluation Stages ---
         logger.info("Starting Evaluation Stages.")
 
         # Stage 1: Automated Checks
         logger.info("Running Stage 1: Length & BERTScore Checks.")
+        stage1_start_time = time.time()
         with processing_placeholder:
             with st.spinner("Running Stage 1: Length & BERTScore Checks..."):
                 # Length Check
@@ -330,11 +342,14 @@ if run_button:
                 else:
                     evaluation_results["bert_score"] = {"score": None, "message": "Summary not available", "passed_threshold": False}
                     logger.warning("Skipping BERTScore calculation as summary is missing or invalid.")
+        stage1_time = time.time() - stage1_start_time
+        evaluation_results["stage1_time"] = stage1_time
 
         # Stage 2: AI Judge
         logger.info("Initiating Stage 2: AI Judge Assessment.")
+        stage2_start_time = time.time()
         ai_judge_assessment = {"data": None, "error": None, "raw_response": None}
-        run_ai_judge = format_passed # Gating decision
+        run_ai_judge = format_passed
         logger.debug(f"Decision to run AI Judge: {run_ai_judge} (FormatOK={format_passed})")
 
         if run_ai_judge:
@@ -365,12 +380,17 @@ if run_button:
              reason = "Skipped due to failure in prior checks (e.g., invalid format)."
              ai_judge_assessment["error"] = reason
              logger.warning(f"AI Judge assessment skipped. Reason: {reason}")
+        stage2_time = time.time() - stage2_start_time
+        evaluation_results["stage2_time"] = stage2_time
 
         evaluation_results["ai_judge_assessment"] = ai_judge_assessment
 
         # Stage 3: Human Feedback (Placeholder)
         logger.info("Setting up Stage 3: Human Feedback placeholder.")
+        stage3_start_time = time.time()
         evaluation_results["user_utility_rating"] = None
+        stage3_time = time.time() - stage3_start_time
+        evaluation_results["stage3_time"] = stage3_time
 
         # Store results
         current_eval_data["evaluation_results"] = evaluation_results
