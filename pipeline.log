@@ -1,0 +1,212 @@
+2025-04-01 14:45:01,797 - INFO - app.py:30 - --- Starting Streamlit App ---
+2025-04-01 14:45:04,912 - INFO - app.py:38 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:45:04,916 - DEBUG - app.py:219 - Initialized evaluation_log in session state.
+2025-04-01 14:45:04,916 - DEBUG - app.py:222 - Initialized current_eval_data in session state.
+2025-04-01 14:45:04,916 - INFO - app.py:499 - No evaluation logs yet in session state.
+2025-04-01 14:45:04,917 - INFO - app.py:515 - --- Streamlit App Execution Completed (End of Script) ---
+2025-04-01 14:45:11,266 - INFO - app.py:30 - --- Starting Streamlit App ---
+2025-04-01 14:45:14,442 - INFO - app.py:38 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:45:14,449 - DEBUG - app.py:219 - Initialized evaluation_log in session state.
+2025-04-01 14:45:14,451 - DEBUG - app.py:222 - Initialized current_eval_data in session state.
+2025-04-01 14:45:14,454 - INFO - app.py:499 - No evaluation logs yet in session state.
+2025-04-01 14:45:14,455 - INFO - app.py:515 - --- Streamlit App Execution Completed (End of Script) ---
+2025-04-01 14:45:18,769 - INFO - app.py:30 - --- Starting Streamlit App ---
+2025-04-01 14:45:18,769 - INFO - app.py:30 - --- Starting Streamlit App ---
+2025-04-01 14:45:18,770 - INFO - app.py:38 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:45:18,770 - INFO - app.py:38 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:45:18,811 - INFO - app.py:234 - --- Pipeline Run Started: Timestamp 1743500718.811178 ---
+2025-04-01 14:45:18,811 - INFO - app.py:234 - --- Pipeline Run Started: Timestamp 1743500718.811178 ---
+2025-04-01 14:45:18,812 - INFO - app.py:241 - Initiating Generation Stage.
+2025-04-01 14:45:18,812 - INFO - app.py:241 - Initiating Generation Stage.
+2025-04-01 14:45:30,974 - DEBUG - app.py:246 - Generator Raw Response Snippet: {
+  "summary": "The video describes a four-stage AI evaluation pipeline. The first stage includes automated checks such as BERTScore and length constraints. The second stage involves an AI Judge, spec...
+2025-04-01 14:45:30,974 - DEBUG - app.py:246 - Generator Raw Response Snippet: {
+  "summary": "The video describes a four-stage AI evaluation pipeline. The first stage includes automated checks such as BERTScore and length constraints. The second stage involves an AI Judge, spec...
+2025-04-01 14:45:30,976 - INFO - app.py:262 - Checking format of generated output.
+2025-04-01 14:45:30,976 - INFO - app.py:262 - Checking format of generated output.
+2025-04-01 14:45:30,976 - INFO - app.py:268 - Generated output format check passed.
+2025-04-01 14:45:30,976 - INFO - app.py:268 - Generated output format check passed.
+2025-04-01 14:45:30,978 - DEBUG - app.py:279 - Successfully parsed and displayed generated data.
+2025-04-01 14:45:30,978 - DEBUG - app.py:279 - Successfully parsed and displayed generated data.
+2025-04-01 14:45:30,978 - INFO - app.py:298 - Starting Evaluation Stages.
+2025-04-01 14:45:30,978 - INFO - app.py:298 - Starting Evaluation Stages.
+2025-04-01 14:45:30,979 - INFO - app.py:301 - Running Stage 1: Length & BERTScore Checks.
+2025-04-01 14:45:30,979 - INFO - app.py:301 - Running Stage 1: Length & BERTScore Checks.
+2025-04-01 14:45:31,084 - DEBUG - app.py:306 - Performing length check.
+2025-04-01 14:45:31,084 - DEBUG - app.py:306 - Performing length check.
+2025-04-01 14:45:31,085 - INFO - app.py:309 - Length check result: Passed=True, Details={'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:31,085 - INFO - app.py:309 - Length check result: Passed=True, Details={'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:31,085 - DEBUG - app.py:318 - Calculating BERTScore.
+2025-04-01 14:45:31,085 - DEBUG - app.py:318 - Calculating BERTScore.
+2025-04-01 14:45:34,419 - INFO - app.py:326 - BERTScore calculated: Score=0.672, PassedThreshold=True
+2025-04-01 14:45:34,419 - INFO - app.py:326 - BERTScore calculated: Score=0.672, PassedThreshold=True
+2025-04-01 14:45:34,420 - INFO - app.py:337 - Initiating Stage 2: AI Judge Assessment.
+2025-04-01 14:45:34,420 - INFO - app.py:337 - Initiating Stage 2: AI Judge Assessment.
+2025-04-01 14:45:34,420 - DEBUG - app.py:343 - Decision to run AI Judge: True (FormatOK=True)
+2025-04-01 14:45:34,420 - DEBUG - app.py:343 - Decision to run AI Judge: True (FormatOK=True)
+2025-04-01 14:45:34,421 - INFO - app.py:347 - Calling AI Judge: gemini-1.5-flash-latest
+2025-04-01 14:45:34,421 - INFO - app.py:347 - Calling AI Judge: gemini-1.5-flash-latest
+2025-04-01 14:45:35,502 - DEBUG - app.py:350 - AI Judge Raw Response Snippet: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,502 - DEBUG - app.py:350 - AI Judge Raw Response Snippet: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,504 - INFO - app.py:356 - AI Judge call successful, parsing response.
+2025-04-01 14:45:35,504 - INFO - app.py:356 - AI Judge call successful, parsing response.
+2025-04-01 14:45:35,504 - ERROR - app.py:364 - Failed to parse AI Judge response: AI Judge JSON missing required keys
+2025-04-01 14:45:35,504 - ERROR - app.py:364 - Failed to parse AI Judge response: AI Judge JSON missing required keys
+2025-04-01 14:45:35,505 - INFO - app.py:382 - Setting up Stage 3: Human Feedback.
+2025-04-01 14:45:35,505 - INFO - app.py:382 - Setting up Stage 3: Human Feedback.
+2025-04-01 14:45:35,506 - INFO - app.py:389 - Evaluation results stored for timestamp 1743500718.811178.
+2025-04-01 14:45:35,506 - INFO - app.py:389 - Evaluation results stored for timestamp 1743500718.811178.
+2025-04-01 14:45:35,506 - DEBUG - app.py:390 - Full evaluation results: {'timestamp': 1743500718.811178, 'format_check': {'passed': True, 'message': 'Valid format'}, 'length_check': {'passed': True, 'details': {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}}, 'bert_score': {'score': 0.6721336245536804, 'message': 'BERTScore F1: 0.6721', 'passed_threshold': True}, 'ai_judge_assessment': {'data': None, 'error': 'AI Judge JSON missing required keys', 'raw_response': '{"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}'}, 'user_utility_rating': None}
+2025-04-01 14:45:35,506 - DEBUG - app.py:390 - Full evaluation results: {'timestamp': 1743500718.811178, 'format_check': {'passed': True, 'message': 'Valid format'}, 'length_check': {'passed': True, 'details': {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}}, 'bert_score': {'score': 0.6721336245536804, 'message': 'BERTScore F1: 0.6721', 'passed_threshold': True}, 'ai_judge_assessment': {'data': None, 'error': 'AI Judge JSON missing required keys', 'raw_response': '{"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}'}, 'user_utility_rating': None}
+2025-04-01 14:45:35,509 - DEBUG - app.py:58 - Displaying evaluation results for timestamp: 1743500718.811178
+2025-04-01 14:45:35,509 - DEBUG - app.py:58 - Displaying evaluation results for timestamp: 1743500718.811178
+2025-04-01 14:45:35,513 - INFO - app.py:73 - Format check passed.
+2025-04-01 14:45:35,513 - INFO - app.py:73 - Format check passed.
+2025-04-01 14:45:35,514 - INFO - app.py:88 - Length check passed. Details: {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:35,514 - INFO - app.py:88 - Length check passed. Details: {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:35,514 - INFO - app.py:102 - BERTScore passed threshold: 0.672
+2025-04-01 14:45:35,514 - INFO - app.py:102 - BERTScore passed threshold: 0.672
+2025-04-01 14:45:35,516 - ERROR - app.py:118 - AI Judge Error reported: AI Judge JSON missing required keys
+2025-04-01 14:45:35,516 - ERROR - app.py:118 - AI Judge Error reported: AI Judge JSON missing required keys
+2025-04-01 14:45:35,518 - DEBUG - app.py:122 - Raw AI Judge Response on error: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,518 - DEBUG - app.py:122 - Raw AI Judge Response on error: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,522 - INFO - app.py:188 - User Utility Rating not yet provided.
+2025-04-01 14:45:35,522 - INFO - app.py:188 - User Utility Rating not yet provided.
+2025-04-01 14:45:35,609 - DEBUG - app.py:481 - Displaying details for Log ID 1
+2025-04-01 14:45:35,609 - DEBUG - app.py:481 - Displaying details for Log ID 1
+2025-04-01 14:45:35,610 - DEBUG - app.py:58 - Displaying evaluation results for timestamp: 1743500718.811178
+2025-04-01 14:45:35,610 - DEBUG - app.py:58 - Displaying evaluation results for timestamp: 1743500718.811178
+2025-04-01 14:45:35,610 - INFO - app.py:73 - Format check passed.
+2025-04-01 14:45:35,610 - INFO - app.py:73 - Format check passed.
+2025-04-01 14:45:35,611 - INFO - app.py:88 - Length check passed. Details: {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:35,611 - INFO - app.py:88 - Length check passed. Details: {'summary_tokens': 98, 'flashcards_tokens': 114, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:45:35,612 - INFO - app.py:102 - BERTScore passed threshold: 0.672
+2025-04-01 14:45:35,612 - INFO - app.py:102 - BERTScore passed threshold: 0.672
+2025-04-01 14:45:35,612 - ERROR - app.py:118 - AI Judge Error reported: AI Judge JSON missing required keys
+2025-04-01 14:45:35,612 - ERROR - app.py:118 - AI Judge Error reported: AI Judge JSON missing required keys
+2025-04-01 14:45:35,613 - DEBUG - app.py:122 - Raw AI Judge Response on error: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,613 - DEBUG - app.py:122 - Raw AI Judge Response on error: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:45:35,616 - INFO - app.py:188 - User Utility Rating not yet provided.
+2025-04-01 14:45:35,616 - INFO - app.py:188 - User Utility Rating not yet provided.
+2025-04-01 14:45:35,618 - INFO - app.py:515 - --- Streamlit App Execution Completed (End of Script) ---
+2025-04-01 14:45:35,618 - INFO - app.py:515 - --- Streamlit App Execution Completed (End of Script) ---
+2025-04-01 14:50:02,805 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:50:05,867 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:50:05,871 - DEBUG - app.py:240 - Initialized evaluation_log in session state.
+2025-04-01 14:50:05,871 - DEBUG - app.py:244 - Initialized current_run_index in session state.
+2025-04-01 14:50:05,872 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 14:50:12,241 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:50:15,156 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:50:15,159 - DEBUG - app.py:240 - Initialized evaluation_log in session state.
+2025-04-01 14:50:15,159 - DEBUG - app.py:244 - Initialized current_run_index in session state.
+2025-04-01 14:50:15,161 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 14:50:34,224 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:50:34,234 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:50:34,284 - INFO - app.py:250 - --- Pipeline Run Button Clicked: Timestamp 1743501034.2843058 ---
+2025-04-01 14:50:34,285 - INFO - app.py:261 - Initiating Generation Stage.
+2025-04-01 14:50:52,035 - DEBUG - app.py:267 - Generator Raw Response Snippet: {
+  "summary": "The video explains the AI evaluation pipeline, which consists of four stages. Stage one employs automated checks such as BERTScore and length constraints. Stage two utilizes an AI Judg...
+2025-04-01 14:50:52,038 - INFO - app.py:282 - Checking format of generated output.
+2025-04-01 14:50:52,039 - INFO - app.py:287 - Generated output format check passed.
+2025-04-01 14:50:52,039 - DEBUG - app.py:291 - Successfully parsed generated data.
+2025-04-01 14:50:52,039 - INFO - app.py:308 - Starting Evaluation Stages.
+2025-04-01 14:50:52,040 - INFO - app.py:311 - Running Stage 1: Length & BERTScore Checks.
+2025-04-01 14:50:52,041 - INFO - app.py:318 - Length check result: Passed=True, Details={'summary_tokens': 96, 'flashcards_tokens': 137, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:50:55,418 - INFO - app.py:329 - BERTScore calculated: Score=0.713, PassedThreshold=True
+2025-04-01 14:50:55,419 - INFO - app.py:335 - Initiating Stage 2: AI Judge Assessment.
+2025-04-01 14:50:55,419 - DEBUG - app.py:338 - Decision to run AI Judge: True (FormatOK=True)
+2025-04-01 14:50:55,420 - INFO - app.py:343 - Calling AI Judge: gemini-1.5-flash-latest
+2025-04-01 14:50:56,645 - DEBUG - app.py:346 - AI Judge Raw Response Snippet: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:50:56,645 - INFO - app.py:352 - AI Judge call successful, parsing response.
+2025-04-01 14:50:56,645 - ERROR - app.py:360 - Failed to parse AI Judge response: AI Judge JSON missing required keys
+2025-04-01 14:50:56,646 - INFO - app.py:372 - Setting up Stage 3: Human Feedback placeholder.
+2025-04-01 14:50:56,646 - INFO - app.py:379 - Evaluation results stored for timestamp 1743501034.2843058. New log length: 1
+2025-04-01 14:50:56,646 - DEBUG - app.py:380 - Full evaluation results for current run: {'timestamp': 1743501034.2843058, 'format_check': {'passed': True, 'message': 'Valid format'}, 'length_check': {'passed': True, 'details': {'summary_tokens': 96, 'flashcards_tokens': 137, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}}, 'bert_score': {'score': 0.7128249406814575, 'message': 'BERTScore F1: 0.7128', 'passed_threshold': True}, 'ai_judge_assessment': {'data': None, 'error': 'AI Judge JSON missing required keys', 'raw_response': '{"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}'}, 'user_utility_rating': None}
+2025-04-01 14:51:36,438 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:51:39,970 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:51:39,976 - DEBUG - app.py:240 - Initialized evaluation_log in session state.
+2025-04-01 14:51:39,976 - DEBUG - app.py:244 - Initialized current_run_index in session state.
+2025-04-01 14:51:39,979 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 14:51:48,684 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:51:51,442 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:51:51,444 - DEBUG - app.py:240 - Initialized evaluation_log in session state.
+2025-04-01 14:51:51,445 - DEBUG - app.py:244 - Initialized current_run_index in session state.
+2025-04-01 14:51:51,447 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 14:51:53,018 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:51:53,019 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:51:53,027 - INFO - app.py:250 - --- Pipeline Run Button Clicked: Timestamp 1743501113.027596 ---
+2025-04-01 14:51:53,029 - INFO - app.py:261 - Initiating Generation Stage.
+2025-04-01 14:52:02,237 - DEBUG - app.py:267 - Generator Raw Response Snippet: {
+  "summary": "The video describes a four-stage AI evaluation pipeline. The first stage includes automated checks such as BERTScore and length constraints. The second stage involves an AI Judge, spec...
+2025-04-01 14:52:02,238 - INFO - app.py:282 - Checking format of generated output.
+2025-04-01 14:52:02,238 - INFO - app.py:287 - Generated output format check passed.
+2025-04-01 14:52:02,239 - DEBUG - app.py:291 - Successfully parsed generated data.
+2025-04-01 14:52:02,239 - INFO - app.py:308 - Starting Evaluation Stages.
+2025-04-01 14:52:02,239 - INFO - app.py:311 - Running Stage 1: Length & BERTScore Checks.
+2025-04-01 14:52:02,240 - INFO - app.py:318 - Length check result: Passed=True, Details={'summary_tokens': 89, 'flashcards_tokens': 92, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}
+2025-04-01 14:52:05,445 - INFO - app.py:329 - BERTScore calculated: Score=0.713, PassedThreshold=True
+2025-04-01 14:52:05,445 - INFO - app.py:335 - Initiating Stage 2: AI Judge Assessment.
+2025-04-01 14:52:05,446 - DEBUG - app.py:338 - Decision to run AI Judge: True (FormatOK=True)
+2025-04-01 14:52:05,446 - INFO - app.py:343 - Calling AI Judge: gemini-1.5-flash-latest
+2025-04-01 14:52:06,567 - DEBUG - app.py:346 - AI Judge Raw Response Snippet: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 14:52:06,567 - INFO - app.py:352 - AI Judge call successful, parsing response.
+2025-04-01 14:52:06,568 - ERROR - app.py:360 - Failed to parse AI Judge response: AI Judge JSON missing required keys
+2025-04-01 14:52:06,569 - INFO - app.py:372 - Setting up Stage 3: Human Feedback placeholder.
+2025-04-01 14:52:06,569 - INFO - app.py:379 - Evaluation results stored for timestamp 1743501113.027596. New log length: 1
+2025-04-01 14:52:06,570 - DEBUG - app.py:380 - Full evaluation results for current run: {'timestamp': 1743501113.027596, 'format_check': {'passed': True, 'message': 'Valid format'}, 'length_check': {'passed': True, 'details': {'summary_tokens': 89, 'flashcards_tokens': 92, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': True, 'overall_ok': True}}, 'bert_score': {'score': 0.713367760181427, 'message': 'BERTScore F1: 0.7134', 'passed_threshold': True}, 'ai_judge_assessment': {'data': None, 'error': 'AI Judge JSON missing required keys', 'raw_response': '{"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}'}, 'user_utility_rating': None}
+2025-04-01 14:52:06,752 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 14:52:06,753 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 14:52:06,756 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743501113.027596
+2025-04-01 14:52:06,777 - DEBUG - app.py:556 - Displaying details for Log ID 1
+2025-04-01 14:52:06,778 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743501113.027596
+2025-04-01 14:52:06,779 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 15:21:28,873 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:21:32,996 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:21:33,002 - DEBUG - app.py:240 - Initialized evaluation_log in session state.
+2025-04-01 15:21:33,002 - DEBUG - app.py:244 - Initialized current_run_index in session state.
+2025-04-01 15:21:33,006 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 15:21:44,751 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:21:44,752 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:21:44,803 - INFO - app.py:250 - --- Pipeline Run Button Clicked: Timestamp 1743502904.8032691 ---
+2025-04-01 15:21:44,805 - INFO - app.py:261 - Initiating Generation Stage.
+2025-04-01 15:22:09,153 - DEBUG - app.py:267 - Generator Raw Response Snippet: {
+  "summary": "The video describes a four-stage AI evaluation pipeline. In stage one, automated checks such as BERTScore and length constraints are employed. Stage two involves an AI Judge, specifica...
+2025-04-01 15:22:09,156 - INFO - app.py:282 - Checking format of generated output.
+2025-04-01 15:22:09,156 - INFO - app.py:287 - Generated output format check passed.
+2025-04-01 15:22:09,156 - DEBUG - app.py:291 - Successfully parsed generated data.
+2025-04-01 15:22:09,157 - INFO - app.py:308 - Starting Evaluation Stages.
+2025-04-01 15:22:09,157 - INFO - app.py:311 - Running Stage 1: Length & BERTScore Checks.
+2025-04-01 15:22:09,170 - INFO - app.py:318 - Length check result: Passed=False, Details={'summary_tokens': 121, 'flashcards_tokens': 157, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': False, 'overall_ok': False}
+2025-04-01 15:22:12,582 - INFO - app.py:329 - BERTScore calculated: Score=0.693, PassedThreshold=True
+2025-04-01 15:22:12,583 - INFO - app.py:335 - Initiating Stage 2: AI Judge Assessment.
+2025-04-01 15:22:12,583 - DEBUG - app.py:338 - Decision to run AI Judge: True (FormatOK=True)
+2025-04-01 15:22:12,584 - INFO - app.py:343 - Calling AI Judge: gemini-1.5-flash-latest
+2025-04-01 15:22:13,856 - DEBUG - app.py:346 - AI Judge Raw Response Snippet: {"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}...
+2025-04-01 15:22:13,857 - INFO - app.py:352 - AI Judge call successful, parsing response.
+2025-04-01 15:22:13,857 - INFO - app.py:356 - Successfully parsed AI Judge response.
+2025-04-01 15:22:13,857 - DEBUG - app.py:357 - Parsed AI Judge Data: {'completeness_score': 5, 'relevance_score': 5, 'clarity_score': 5, 'accuracy_assessment': {'contains_inaccuracies': False, 'explanation': ''}, 'optional_overall_notes': ''}
+2025-04-01 15:22:13,858 - INFO - app.py:372 - Setting up Stage 3: Human Feedback placeholder.
+2025-04-01 15:22:13,858 - INFO - app.py:379 - Evaluation results stored for timestamp 1743502904.8032691. New log length: 1
+2025-04-01 15:22:13,858 - DEBUG - app.py:380 - Full evaluation results for current run: {'timestamp': 1743502904.8032691, 'format_check': {'passed': True, 'message': 'Valid format'}, 'length_check': {'passed': False, 'details': {'summary_tokens': 121, 'flashcards_tokens': 157, 'summary_limit': 500, 'flashcards_limit': 150, 'summary_ok': True, 'flashcards_ok': False, 'overall_ok': False}}, 'bert_score': {'score': 0.6926636099815369, 'message': 'BERTScore F1: 0.6927', 'passed_threshold': True}, 'ai_judge_assessment': {'data': {'completeness_score': 5, 'relevance_score': 5, 'clarity_score': 5, 'accuracy_assessment': {'contains_inaccuracies': False, 'explanation': ''}, 'optional_overall_notes': ''}, 'error': None, 'raw_response': '{"contains_inaccuracies": false, "accuracy_explanation": "", "completeness_score": 5, "relevance_score": 5, "clarity_score": 5}'}, 'user_utility_rating': None}
+2025-04-01 15:22:14,117 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:22:14,118 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:22:14,123 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:14,174 - DEBUG - app.py:556 - Displaying details for Log ID 1
+2025-04-01 15:22:14,175 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:14,177 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 15:22:43,863 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:22:43,865 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:22:43,920 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:43,949 - DEBUG - app.py:556 - Displaying details for Log ID 1
+2025-04-01 15:22:43,955 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:43,962 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---
+2025-04-01 15:22:44,530 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:22:44,530 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:22:44,545 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:44,550 - INFO - app.py:494 - User submitted rating: 3 for log index 0 (Timestamp: 1743502904.8032691)
+2025-04-01 15:22:44,671 - INFO - app.py:32 - --- Starting Streamlit App ---
+2025-04-01 15:22:44,671 - INFO - app.py:39 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-01 15:22:44,675 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:44,679 - DEBUG - app.py:556 - Displaying details for Log ID 1
+2025-04-01 15:22:44,680 - DEBUG - app.py:62 - Displaying evaluation results for timestamp: 1743502904.8032691
+2025-04-01 15:22:44,682 - INFO - app.py:583 - --- Streamlit App Re-Render Complete ---

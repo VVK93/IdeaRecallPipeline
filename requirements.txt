@@ -1,0 +1,9 @@
+streamlit
+openai
+google-generativeai
+python-dotenv
+bert-score
+transformers
+torch
+pandas
+tiktoken
