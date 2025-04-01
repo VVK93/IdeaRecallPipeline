@@ -6,6 +6,7 @@ import time
 import pandas as pd
 import logging
 import traceback # For detailed error logging
+import youtube_handler  # Add this import at the top with other imports
 
 # --- Configure Logging ---
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
@@ -49,6 +50,9 @@ except Exception as e:
 
 # --- Streamlit Page Configuration ---
 st.set_page_config(layout="wide", page_title="AI Product Eval Pipeline")
+
+# Initialize default transcript
+transcript_input_default = ""
 
 # --- Helper Functions ---
 def display_evaluation_results(eval_data):
@@ -226,26 +230,41 @@ st.title("📝 AI Product Evaluation Pipeline: Idea Recall Bot")
 
 # --- Sidebar for Input and Run ---
 st.sidebar.header("Input & Control")
-transcript_input_default="This is a sample transcript about AI evaluation pipelines. Stage one involves automated checks like BERTScore and length constraints. Stage two uses an AI Judge, maybe Gemini 1.5 Flash, to assess accuracy, completeness, relevance, and clarity based on a detailed prompt. Stage three gathers human feedback on utility via ratings. The final stage involves logging all results and iteratively improving the generator prompts, judge prompts, or thresholds based on observed performance against targets like accuracy rate below 5% and scores above 4.0 for qualitative metrics."
-transcript_input = st.sidebar.text_area(
-    "Paste Video Transcript Here:",
-    height=250,
-    key="transcript_input",
-    value=transcript_input_default,
-    help="Paste the source text you want to process."
+
+# Add YouTube URL input
+youtube_url = st.sidebar.text_input(
+    "YouTube Video URL:",
+    key="youtube_url",
+    help="Enter a YouTube video URL to automatically download its transcript and run the evaluation pipeline."
 )
-run_button = st.sidebar.button(
-    "🚀 Run Evaluation Pipeline",
-    disabled=not transcript_input or not keys_ok, # Disable if keys missing
-    help="Process the transcript through the generation and evaluation pipeline."
-)
+
+# Single button to handle both transcript download and pipeline execution
+if st.sidebar.button("🚀 Download & Run Pipeline", disabled=not youtube_url):
+    # Create a spinner outside the sidebar
+    with st.spinner("Downloading transcript and running pipeline..."):
+        # First download the transcript
+        transcript, error = youtube_handler.download_transcript(youtube_url)
+        if error:
+            st.sidebar.error(f"Failed to download transcript: {error}")
+        else:
+            st.sidebar.success("Transcript downloaded successfully!")
+            # Store the transcript in session state
+            st.session_state.transcript_input = transcript
+            # Set a flag to trigger pipeline execution
+            st.session_state.run_pipeline = True
+
+# Initialize session state for transcript and pipeline trigger
+if 'transcript_input' not in st.session_state:
+    st.session_state.transcript_input = ""
+if 'run_pipeline' not in st.session_state:
+    st.session_state.run_pipeline = False
+
 st.sidebar.divider()
 st.sidebar.header("Iterative Improvement")
 st.sidebar.info(
     "Analyze results in the 'Evaluation Results' and 'Run Log' tabs. If metrics fall below targets, consider refining prompts (see 'Configuration' tab), adjusting thresholds, or changing models."
 )
 st.sidebar.caption(f"Generator: {config.GENERATOR_MODEL_ID}\nJudge: {config.JUDGE_MODEL_ID}")
-
 
 # --- Initialize session state ---
 if 'evaluation_log' not in st.session_state:
@@ -256,17 +275,19 @@ if 'current_run_index' not in st.session_state:
     st.session_state.current_run_index = None
     logger.debug("Initialized current_run_index in session state.")
 
-
 # --- Pipeline Execution Logic ---
-if run_button:
+if st.session_state.run_pipeline:
     run_timestamp = time.time()
-    logger.info(f"--- Pipeline Run Button Clicked: Timestamp {run_timestamp} ---")
+    logger.info(f"--- Pipeline Run Initiated: Timestamp {run_timestamp} ---")
     # Create placeholder for results while processing
     processing_placeholder = st.empty()
     processing_placeholder.info("🚀 Pipeline Run Initiated...")
 
-    current_eval_data = {"transcript": transcript_input, "timestamp": run_timestamp}
-    evaluation_results = {"timestamp": run_timestamp} # Start fresh results dict
+    current_eval_data = {"transcript": st.session_state.transcript_input, "timestamp": run_timestamp}
+    evaluation_results = {"timestamp": run_timestamp}  # Start fresh results dict
+
+    # Reset the pipeline trigger
+    st.session_state.run_pipeline = False
 
     # Wrap execution in try-finally to ensure placeholder is cleared
     try:
@@ -275,7 +296,7 @@ if run_button:
         gen_start_time = time.time()
         with processing_placeholder: # Show status within the placeholder
              with st.spinner(f"Running Pipeline... Calling Generator ({config.GENERATOR_MODEL_ID})..."):
-                generated_json_str, gen_error = llm_interface.call_generator_llm(transcript_input)
+                generated_json_str, gen_error = llm_interface.call_generator_llm(st.session_state.transcript_input)
                 current_eval_data["generated_json_str"] = generated_json_str
                 current_eval_data["generator_error"] = gen_error
                 logger.debug(f"Generator Raw Response Snippet: {generated_json_str[:200] if generated_json_str else 'None'}...")
@@ -335,7 +356,7 @@ if run_button:
                 # BERTScore Check
                 summary_text = generated_data.get("summary") if generated_data and "error" not in generated_data else None
                 if summary_text:
-                    bert_score_val, bert_msg = evaluation_metrics.calculate_bertscore(summary_text, transcript_input)
+                    bert_score_val, bert_msg = evaluation_metrics.calculate_bertscore(summary_text, st.session_state.transcript_input)
                     bert_passed_threshold = bert_score_val >= config.BERTSCORE_THRESHOLD
                     evaluation_results["bert_score"] = {"score": bert_score_val, "message": bert_msg, "passed_threshold": bert_passed_threshold}
                     logger.info(f"BERTScore calculated: Score={bert_score_val:.3f}, PassedThreshold={bert_passed_threshold}")
@@ -356,7 +377,7 @@ if run_button:
             with processing_placeholder:
                 with st.spinner(f"Running Stage 2: AI Judge Assessment ({config.JUDGE_MODEL_ID})..."):
                     logger.info(f"Calling AI Judge: {config.JUDGE_MODEL_ID}")
-                    ai_judge_response_str, judge_error = llm_interface.call_ai_judge_llm(transcript_input, generated_json_str)
+                    ai_judge_response_str, judge_error = llm_interface.call_ai_judge_llm(st.session_state.transcript_input, generated_json_str)
                     ai_judge_assessment["raw_response"] = ai_judge_response_str
                     logger.debug(f"AI Judge Raw Response Snippet: {ai_judge_response_str[:200] if ai_judge_response_str else 'None'}...")
 
@@ -445,6 +466,14 @@ with tab_config:
          # Display the template showing the placeholders correctly
          judge_prompt_display = config.AI_JUDGE_PROMPT_TEMPLATE.replace('{transcript}', '{transcript_placeholder}').replace('{generated_json_string}', '{generated_json_placeholder}')
          st.text(judge_prompt_display)
+
+    st.divider()
+    st.header("Source Transcript")
+    if st.session_state.transcript_input:
+        with st.expander("📝 View Downloaded Transcript", expanded=False):
+            st.text_area("Transcript Text", st.session_state.transcript_input, height=300, disabled=True)
+    else:
+        st.info("No transcript available. Download a transcript using the YouTube URL input in the sidebar.")
 
 # --- Populate Tab 2: Generated Output ---
 with tab_output:
