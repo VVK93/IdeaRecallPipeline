@@ -10,13 +10,13 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 # Model Identifiers
-GENERATOR_MODEL_ID = "gpt-4-turbo" # Or specific version like "gpt-4-1106-preview"
+GENERATOR_MODEL_ID = "gpt-4-turbo" 
 JUDGE_MODEL_ID = "gemini-1.5-flash-latest"
 
 # --- Evaluation Thresholds ---
 BERTSCORE_THRESHOLD = 0.55 # Minimum F1 score for semantic sanity check
 SUMMARY_MAX_TOKENS = 500 # Target constraint given to LLM
-FLASHCARDS_MAX_TOKENS = 150 # Target constraint given to LLM
+FLASHCARDS_MAX_TOKENS = 250 # Target constraint given to LLM
 ACCURACY_FAILURE_THRESHOLD_PERCENT = 5.0 # Target: Less than 5% inaccurate (for overall tracking)
 COMPLETENESS_TARGET_SCORE = 4.0
 RELEVANCE_TARGET_SCORE = 4.0
@@ -41,13 +41,16 @@ Example Format:
 }
 """
 
-SYSTEM_PROMPT_GENERATION = f"""You are an expert content analyzer tasked with creating concise, clear, and accurate summaries and effective learning flashcards from video transcripts. Your goal is to help users quickly understand core concepts and practice recall.
+SYSTEM_PROMPT_GENERATION = f"""You are an expert content analyzer tasked with creating clear, and accurate summaries and effective learning flashcards from video transcripts. 
+Your goal is to help users quickly understand core concepts and practice recall.
+
+The summary MUST Cover all the main ideas, key arguments, and significant conclusions presented in the transcript. Add quotes from the transcript to support the summary and use examples to illustrate the points if possible.
 
 **Instructions & Constraints:**
 
-1.  **Accuracy & Faithfulness:** Base the summary and flashcards *strictly* on the information present in the provided transcript. Do *not* add external information, opinions, interpretations, or speculations. Avoid hallucinations.
+1.  **Accuracy & Faithfulness:** Base the summary and flashcards strictly on the information present in the provided transcript.
 2.  **Completeness:** Identify and include *all* essential main ideas, key arguments, and significant conclusions presented in the transcript within the summary. Ensure flashcards cover distinct key concepts.
-3.  **Relevance:** Focus *only* on the most important, central topics for both the summary and flashcards. Omit minor details, tangential information, and redundancy unless critical for understanding the core message.
+3.  **Relevance:** Focus on the most important, central topics for both the summary and flashcards. Omit minor details, tangential information, and redundancy unless critical for understanding the core message.
 4.  **Length:**
     *   The entire "summary" text MUST be **under {SUMMARY_MAX_TOKENS} tokens**.
     *   The *entire* "flashcards" array (all questions and answers combined) MUST total **under {FLASHCARDS_MAX_TOKENS} tokens**. Aim for 5-10 high-quality flashcards.
@@ -62,7 +65,7 @@ Adhere STRICTLY to the JSON format.
 
 USER_PROMPT_GENERATION = """Please analyze the following transcript and generate a JSON output containing:
 1. A summary that is accurate, complete, relevant, clear, and adheres to the length limits.
-2. A set of 5-10 flashcards that are accurate, relevant, clear, useful for recall, and adhere to the length limits.
+2. A set of 5 flashcards that are accurate, relevant, clear, useful for recall, and adhere to the length limits.
 
 Strictly follow the JSON format specified in the system instructions. Respond ONLY with the valid JSON object.
 

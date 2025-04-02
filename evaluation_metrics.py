@@ -1,32 +1,26 @@
-# evaluation_metrics.py
-
 import json
 from bert_score import score as bert_score_calculate
 import torch
-import tiktoken # Import the tokenizer
+import tiktoken 
 import config
 import transformers # Needed dependency for bert-score
 import logging
 
-logger = logging.getLogger(__name__) # Get the logger configured in app.py
+logger = logging.getLogger(__name__) 
 
 # --- Token Counting ---
-# Initialize the tokenizer for GPT-4 models
 try:
-    # cl100k_base is the encoding for gpt-4, gpt-3.5-turbo, text-embedding-ada-002
     encoding = tiktoken.get_encoding("cl100k_base")
     logger.info("Tiktoken encoding 'cl100k_base' loaded successfully.")
 except Exception as e:
     logger.error(f"Failed to load tiktoken encoding 'cl100k_base': {e}", exc_info=True)
-    # Fallback or raise error depending on requirements
-    encoding = None # Indicate failure
+    encoding = None
 
 def count_tokens(text: str) -> int:
     """Counts the number of tokens in a text string using tiktoken."""
     if encoding is None:
         logger.error("Tiktoken encoding not available, cannot count tokens accurately.")
-        # Fallback to rough estimate if encoding failed to load
-        return len(text.split())
+        return len(text.split()) # Fallback
     if not isinstance(text, str):
         logger.warning(f"Input to count_tokens was not a string (type: {type(text)}), returning 0 tokens.")
         return 0
@@ -35,11 +29,9 @@ def count_tokens(text: str) -> int:
         return num_tokens
     except Exception as e:
         logger.error(f"Error during tiktoken encoding: {e}", exc_info=True)
-        # Fallback or return error indication
-        return -1 # Indicate an error occurred
+        return -1
 
-# --- Format and Structure Checks ---
-
+# --- Format and Structure Checks (Keep previous version) ---
 def check_format(generated_json_str):
     """Checks if the string is valid JSON and has the required top-level keys."""
     logger.debug("Checking format of generated JSON string...")
@@ -50,7 +42,6 @@ def check_format(generated_json_str):
         data = json.loads(generated_json_str)
         if isinstance(data, dict) and "summary" in data and "flashcards" in data:
             if isinstance(data["summary"], str) and isinstance(data["flashcards"], list):
-                 # Check flashcard structure
                  for i, item in enumerate(data["flashcards"]):
                      if not (isinstance(item, dict) and "question" in item and "answer" in item and
                              isinstance(item["question"], str) and isinstance(item["answer"], str) ):
@@ -91,15 +82,13 @@ def check_length(generated_data):
         for card in flashcards_list:
             q = card.get("question", "")
             a = card.get("answer", "")
-            # Add separators unlikely to be tokenized together if needed,
-            # but encoding the combined string is usually sufficient.
             flashcards_text += f"Q: {q}\nA: {a}\n\n"
     else:
         logger.warning(f"Flashcards data is not a list (type: {type(flashcards_list)}), cannot calculate token count.")
 
-    flashcards_tokens = count_tokens(flashcards_text.strip()) # Count combined flashcard text
+    flashcards_tokens = count_tokens(flashcards_text.strip())
 
-    summary_ok = summary_tokens >= 0 and summary_tokens <= config.SUMMARY_MAX_TOKENS # Check for errors (-1)
+    summary_ok = summary_tokens >= 0 and summary_tokens <= config.SUMMARY_MAX_TOKENS
     flashcards_ok = flashcards_tokens >= 0 and flashcards_tokens <= config.FLASHCARDS_MAX_TOKENS
 
     details = {
@@ -124,28 +113,48 @@ def calculate_bertscore(generated_summary, reference_transcript):
         return 0.0, "Missing summary or transcript for BERTScore"
 
     try:
+        # Log input snippets for debugging
+        summary_snippet = str(generated_summary)[:100] + "..." if len(str(generated_summary)) > 100 else str(generated_summary)
+        ref_snippet = str(reference_transcript)[:100] + "..." if len(str(reference_transcript)) > 100 else str(reference_transcript)
+        logger.debug(f"BERTScore Inputs: Cand='{summary_snippet}', Ref='{ref_snippet}'")
+
         cands = [str(generated_summary)]
         refs = [str(reference_transcript)]
         device = 'cuda' if torch.cuda.is_available() else 'cpu'
         logger.info(f"Calculating BERTScore on device: {device}")
 
-        # Make sure transformers library is available
         if 'transformers' not in globals():
             raise ImportError("Transformers library is required for BERTScore but not found.")
 
-        P, R, F1 = bert_score_calculate(cands, refs, lang="en", verbose=False, device=device, rescale_with_baseline=True)
+        # Calculate RAW scores first (remove rescale_with_baseline)
+        P, R, F1 = bert_score_calculate(cands, refs, lang="en", verbose=False, device=device) # Removed rescale_with_baseline=True
+
+        # Log the raw tensors
+        logger.debug(f"Raw BERTScore Tensors: P={P}, R={R}, F1={F1}")
+
+        # Extract F1 score
         f1_score = F1.item()
-        logger.info(f"BERTScore F1 calculated: {f1_score:.4f}")
+
+        # Add a check for unexpected range
+        if not (0.0 <= f1_score <= 1.0):
+             logger.warning(f"BERTScore F1 calculation resulted in an unexpected value: {f1_score:.4f}. Check inputs and library version.")
+             # You might choose to clamp it or return an error indicator
+             # Clamping example: f1_score = max(0.0, min(1.0, f1_score))
+             # For now, just log the warning.
+
+        logger.info(f"BERTScore F1 calculated (raw): {f1_score:.4f}")
         return f1_score, f"BERTScore F1: {f1_score:.4f}"
+
     except ImportError as e:
          logger.error(f"ImportError during BERTScore calculation: {e}. Is 'transformers' installed?")
          return 0.0, f"ImportError: {e}"
     except Exception as e:
-        logger.error(f"Error calculating BERTScore: {e}", exc_info=True)
+        # Log the specific inputs that caused the error if possible
+        logger.error(f"Error calculating BERTScore for Cand='{summary_snippet}', Ref='{ref_snippet}': {e}", exc_info=True)
         return 0.0, f"Error calculating BERTScore: {e}"
 
-# --- AI Judge Parsing ---
 
+# --- AI Judge Parsing (Keep previous version that handles flattened structure) ---
 def parse_ai_judge_response(response_str):
     """
     Parses the JSON response from the AI Judge.
@@ -167,7 +176,6 @@ def parse_ai_judge_response(response_str):
         eval_data = json.loads(response_str)
         logger.debug(f"Successfully loaded JSON from AI Judge: {eval_data}")
 
-        # Validation and Reconstruction
         required_top_level_keys = ["completeness_score", "relevance_score", "clarity_score"]
         reconstructed_data = {}
         missing_keys = []

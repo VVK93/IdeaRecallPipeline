@@ -62,7 +62,6 @@ def display_evaluation_results(eval_data):
         return
 
     log_timestamp = eval_data.get('timestamp')
-    st.markdown(f"Evaluation for Run Timestamp: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(log_timestamp)) if log_timestamp else 'N/A'}")
     logger.debug(f"Displaying evaluation results for timestamp: {log_timestamp}")
 
     st.markdown("---") # Separator
@@ -226,10 +225,10 @@ except Exception as e:
 
 # --- Main App Structure ---
 
-st.title("📝 AI Product Evaluation Pipeline: Idea Recall Bot")
+st.title("📝 Evaluation Pipeline for Idea Recall Bot")
 
 # --- Sidebar for Input and Run ---
-st.sidebar.header("Input & Control")
+st.sidebar.header("Input")
 
 # Add YouTube URL input
 youtube_url = st.sidebar.text_input(
@@ -260,7 +259,7 @@ if 'run_pipeline' not in st.session_state:
     st.session_state.run_pipeline = False
 
 st.sidebar.divider()
-st.sidebar.header("Iterative Improvement")
+st.sidebar.header("Iterative Improvement Notes")
 st.sidebar.info(
     "Analyze results in the 'Evaluation Results' and 'Run Log' tabs. If metrics fall below targets, consider refining prompts (see 'Configuration' tab), adjusting thresholds, or changing models."
 )
