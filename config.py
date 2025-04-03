@@ -14,7 +14,7 @@ GENERATOR_MODEL_ID = "gpt-4-turbo"
 JUDGE_MODEL_ID = "gemini-1.5-flash-latest"
 
 # --- Evaluation Thresholds ---
-BERTSCORE_THRESHOLD = 0.55 # Minimum F1 score for semantic sanity check
+BERTSCORE_THRESHOLD = 0.65 # Minimum F1 score for semantic sanity check
 SUMMARY_MAX_TOKENS = 500 # Target constraint given to LLM
 FLASHCARDS_MAX_TOKENS = 250 # Target constraint given to LLM
 ACCURACY_FAILURE_THRESHOLD_PERCENT = 5.0 # Target: Less than 5% inaccurate (for overall tracking)
