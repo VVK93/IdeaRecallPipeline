@@ -1,6 +1,7 @@
 # AI Product Evaluation Pipeline
 
-A Streamlit-based application that evaluates and generates summaries and flashcards from video transcripts using AI models.
+This is a code for Streamlit-based application that implements the evaluation pipeline for Ideas Recall telegram bot and fully described in this article https://vvk93.substack.com/p/building-an-ai-powered-telegram-bot
+This evaluation pipeline was used to test prompts and AI capabilities and was later used for real telegram bot with some minor changes.
 
 ## Overview
 
