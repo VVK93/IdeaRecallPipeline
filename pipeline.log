@@ -905,3 +905,13 @@
 2025-04-02 14:27:06,976 - DEBUG - app.py:604 - Displaying details for Log ID 2
 2025-04-02 14:27:06,977 - DEBUG - app.py:65 - Displaying evaluation results for timestamp: 1743585455.3297741
 2025-04-02 14:27:06,979 - INFO - app.py:631 - --- Streamlit App Re-Render Complete ---
+2025-04-03 13:35:52,689 - INFO - app.py:26 - --- Starting Streamlit App ---
+2025-04-03 13:35:56,019 - INFO - app.py:32 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-03 13:35:56,028 - DEBUG - app.py:238 - Initialized evaluation_log in session state.
+2025-04-03 13:35:56,028 - DEBUG - app.py:241 - Initialized current_run_index in session state.
+2025-04-03 13:35:56,029 - INFO - app.py:559 - --- Streamlit App Re-Render Complete ---
+2025-04-03 13:36:01,626 - INFO - app.py:26 - --- Starting Streamlit App ---
+2025-04-03 13:36:04,915 - INFO - app.py:32 - Successfully imported config, llm_interface, and evaluation_metrics.
+2025-04-03 13:36:04,927 - DEBUG - app.py:238 - Initialized evaluation_log in session state.
+2025-04-03 13:36:04,928 - DEBUG - app.py:241 - Initialized current_run_index in session state.
+2025-04-03 13:36:04,955 - INFO - app.py:559 - --- Streamlit App Re-Render Complete ---

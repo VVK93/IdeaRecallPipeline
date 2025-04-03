@@ -1,38 +1,30 @@
-# app.py
-
 import streamlit as st
 import json
 import time
 import pandas as pd
 import logging
-import traceback # For detailed error logging
-import youtube_handler  # Add this import at the top with other imports
+import traceback
+import youtube_handler
 
-# --- Configure Logging ---
 log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) # Set the minimum level to capture
+logger.setLevel(logging.DEBUG)
 
-# Avoid adding handlers multiple times if script reruns
 if not logger.handlers:
-    # Console Handler
     stream_handler = logging.StreamHandler()
     stream_handler.setFormatter(log_formatter)
     logger.addHandler(stream_handler)
 
-    # File Handler (persistent logs)
     try:
-        file_handler = logging.FileHandler("pipeline.log", mode='a') # Append mode
+        file_handler = logging.FileHandler("pipeline.log", mode='a')
         file_handler.setFormatter(log_formatter)
         logger.addHandler(file_handler)
     except Exception as e:
-        # Fallback if file logging fails (e.g., permissions)
         st.error(f"Could not configure file logging: {e}")
         logger.error(f"Failed to configure file logger: {e}")
 
 logger.info("--- Starting Streamlit App ---")
 
-# --- Import configurations and functions AFTER logging setup ---
 try:
     import config
     import llm_interface
@@ -47,16 +39,9 @@ except Exception as e:
      st.error(f"Critical Error during imports: {e}")
      st.stop()
 
-
-# --- Streamlit Page Configuration ---
 st.set_page_config(layout="wide", page_title="AI Product Eval Pipeline")
 
-# Initialize default transcript
-transcript_input_default = ""
-
-# --- Helper Functions ---
 def display_evaluation_results(eval_data):
-    """Displays the formatted evaluation results WITHIN A TAB."""
     if not eval_data:
         st.info("No evaluation data available for the selected run.")
         return
@@ -64,9 +49,8 @@ def display_evaluation_results(eval_data):
     log_timestamp = eval_data.get('timestamp')
     logger.debug(f"Displaying evaluation results for timestamp: {log_timestamp}")
 
-    st.markdown("---") # Separator
+    st.markdown("---")
 
-    # Generation Stage Results
     gen_time = eval_data.get("generation_time", 0)
     st.subheader(f"Generation Stage 🎯 ({gen_time:.1f}s)")
     if eval_data.get("generator_error"):
@@ -74,12 +58,12 @@ def display_evaluation_results(eval_data):
     else:
         st.success("Generation completed successfully")
 
-    st.markdown("---") # Separator
+    st.markdown("---")
 
-    # Stage 1 Results
     stage1_time = eval_data.get("stage1_time", 0)
     st.subheader(f"Stage 1: Automated Checks ⚡ ({stage1_time:.1f}s)")
     col1, col2, col3 = st.columns(3)
+    
     with col1:
         format_check_data = eval_data.get("format_check", {})
         format_ok = format_check_data.get("passed", False)
@@ -88,6 +72,7 @@ def display_evaluation_results(eval_data):
                   help=format_msg if not format_ok else None)
         if not format_ok:
             st.error(f"Reason: {format_msg}")
+            
     with col2:
         length_check_data = eval_data.get("length_check", {})
         length_ok = length_check_data.get("passed", False)
@@ -101,13 +86,13 @@ def display_evaluation_results(eval_data):
                     st.warning(f"Summary: {len_details.get('summary_tokens', 'N/A')} / {len_details.get('summary_limit', 'N/A')} tokens")
                 if not len_details.get('flashcards_ok', True):
                     st.warning(f"Flashcards: {len_details.get('flashcards_tokens', 'N/A')} / {len_details.get('flashcards_limit', 'N/A')} tokens")
-        elif len_details: # Show details only if available
+        elif len_details:
              st.caption(f"Summary: {len_details.get('summary_tokens', 'N/A')} / {len_details.get('summary_limit', 'N/A')}")
              st.caption(f"Flashcards: {len_details.get('flashcards_tokens', 'N/A')} / {len_details.get('flashcards_limit', 'N/A')}")
 
     with col3:
         bert_score_data = eval_data.get("bert_score", {})
-        bert_score = bert_score_data.get("score", None) # Use None to check if calculated
+        bert_score = bert_score_data.get("score", None)
         bert_passed = bert_score_data.get("passed_threshold", False)
         bert_msg = bert_score_data.get("message","")
         st.metric(label="BERTScore F1 (Sanity Check)", value=f"{'✅' if bert_passed else '❌'} {bert_score:.3f}" if bert_score is not None else "N/A",
@@ -119,10 +104,8 @@ def display_evaluation_results(eval_data):
         else:
              st.caption("Not calculated (e.g., missing summary)")
 
+    st.markdown("---")
 
-    st.markdown("---") # Separator
-
-    # Stage 2 Results
     stage2_time = eval_data.get("stage2_time", 0)
     st.subheader(f"Stage 2: AI Judge Assessment 🤖 ({stage2_time:.1f}s)")
     ai_judge_results_data = eval_data.get("ai_judge_assessment", {})
@@ -138,7 +121,7 @@ def display_evaluation_results(eval_data):
 
     elif ai_judge_results:
         col_acc, col_comp, col_rel, col_clar = st.columns(4)
-        # Accuracy
+        
         accuracy_data = ai_judge_results.get("accuracy_assessment", {})
         inaccurate = accuracy_data.get("contains_inaccuracies", None)
         with col_acc:
@@ -150,7 +133,7 @@ def display_evaluation_results(eval_data):
                 st.json({"Result": result})
             if inaccurate:
                 st.error(f"Explanation: {accuracy_data.get('explanation', 'None provided')}", icon="❗")
-        # Completeness
+                
         comp_score = ai_judge_results.get("completeness_score")
         comp_target = config.COMPLETENESS_TARGET_SCORE
         with col_comp:
@@ -159,7 +142,7 @@ def display_evaluation_results(eval_data):
                       delta=f"{comp_score - comp_target:.1f}" if isinstance(comp_score, (int, float)) else None,
                       delta_color="normal" if isinstance(comp_score, (int, float)) and comp_score >= comp_target else "inverse",
                       help=f"Target: ≥ {comp_target}")
-        # Relevance
+                      
         rel_score = ai_judge_results.get("relevance_score")
         rel_target = config.RELEVANCE_TARGET_SCORE
         with col_rel:
@@ -168,7 +151,7 @@ def display_evaluation_results(eval_data):
                       delta=f"{rel_score - rel_target:.1f}" if isinstance(rel_score, (int, float)) else None,
                       delta_color="normal" if isinstance(rel_score, (int, float)) and rel_score >= rel_target else "inverse",
                       help=f"Target: ≥ {rel_target}")
-        # Clarity
+                      
         clar_score = ai_judge_results.get("clarity_score")
         clar_target = config.CLARITY_TARGET_SCORE
         with col_clar:
@@ -184,9 +167,8 @@ def display_evaluation_results(eval_data):
     else:
         st.warning("AI Judge assessment was not performed or did not return valid data.")
 
-    st.markdown("---") # Separator
+    st.markdown("---")
 
-    # Stage 3 Results
     st.subheader(f"Stage 3: Human Feedback (Utility) 👤")
     user_rating = eval_data.get("user_utility_rating")
     util_target = config.UTILITY_TARGET_SCORE
@@ -198,10 +180,7 @@ def display_evaluation_results(eval_data):
     else:
         st.info("User rating not yet provided for this item.")
 
-
-# --- Check API Keys ---
 keys_ok = True
-# Wrap in try-except in case config itself failed to load
 try:
     if not config.OPENAI_API_KEY:
         st.error("OpenAI API Key not found. Please set it in the .env file (OPENAI_API_KEY=...)")
@@ -222,37 +201,26 @@ except Exception as e:
     keys_ok = False
     st.stop()
 
-
-# --- Main App Structure ---
-
 st.title("📝 Evaluation Pipeline for Idea Recall Bot")
 
-# --- Sidebar for Input and Run ---
 st.sidebar.header("Input")
 
-# Add YouTube URL input
 youtube_url = st.sidebar.text_input(
     "YouTube Video URL:",
     key="youtube_url",
     help="Enter a YouTube video URL to automatically download its transcript and run the evaluation pipeline."
 )
 
-# Single button to handle both transcript download and pipeline execution
 if st.sidebar.button("🚀 Download & Run Pipeline", disabled=not youtube_url):
-    # Create a spinner outside the sidebar
     with st.spinner("Downloading transcript and running pipeline..."):
-        # First download the transcript
         transcript, error = youtube_handler.download_transcript(youtube_url)
         if error:
             st.sidebar.error(f"Failed to download transcript: {error}")
         else:
             st.sidebar.success("Transcript downloaded successfully!")
-            # Store the transcript in session state
             st.session_state.transcript_input = transcript
-            # Set a flag to trigger pipeline execution
             st.session_state.run_pipeline = True
 
-# Initialize session state for transcript and pipeline trigger
 if 'transcript_input' not in st.session_state:
     st.session_state.transcript_input = ""
 if 'run_pipeline' not in st.session_state:
@@ -265,35 +233,28 @@ st.sidebar.info(
 )
 st.sidebar.caption(f"Generator: {config.GENERATOR_MODEL_ID}\nJudge: {config.JUDGE_MODEL_ID}")
 
-# --- Initialize session state ---
 if 'evaluation_log' not in st.session_state:
     st.session_state.evaluation_log = []
     logger.debug("Initialized evaluation_log in session state.")
 if 'current_run_index' not in st.session_state:
-    # Stores the index in evaluation_log for the *most recently executed* run this session
     st.session_state.current_run_index = None
     logger.debug("Initialized current_run_index in session state.")
 
-# --- Pipeline Execution Logic ---
 if st.session_state.run_pipeline:
     run_timestamp = time.time()
     logger.info(f"--- Pipeline Run Initiated: Timestamp {run_timestamp} ---")
-    # Create placeholder for results while processing
     processing_placeholder = st.empty()
     processing_placeholder.info("🚀 Pipeline Run Initiated...")
 
     current_eval_data = {"transcript": st.session_state.transcript_input, "timestamp": run_timestamp}
-    evaluation_results = {"timestamp": run_timestamp}  # Start fresh results dict
+    evaluation_results = {"timestamp": run_timestamp}
 
-    # Reset the pipeline trigger
     st.session_state.run_pipeline = False
 
-    # Wrap execution in try-finally to ensure placeholder is cleared
     try:
-        # --- Generation Stage ---
         logger.info("Initiating Generation Stage.")
         gen_start_time = time.time()
-        with processing_placeholder: # Show status within the placeholder
+        with processing_placeholder:
              with st.spinner(f"Running Pipeline... Calling Generator ({config.GENERATOR_MODEL_ID})..."):
                 generated_json_str, gen_error = llm_interface.call_generator_llm(st.session_state.transcript_input)
                 current_eval_data["generated_json_str"] = generated_json_str
@@ -307,14 +268,12 @@ if st.session_state.run_pipeline:
             error_msg = gen_error or "Empty response from Generator LLM."
             st.error(f"Generation Failed: {error_msg}")
             if generated_json_str: st.code(generated_json_str, language='text')
-            # Store minimal failure info
             current_eval_data["evaluation_results"] = evaluation_results
             st.session_state.evaluation_log.append(current_eval_data)
             st.session_state.current_run_index = len(st.session_state.evaluation_log) - 1
-            processing_placeholder.empty() # Clear spinner/message
+            processing_placeholder.empty()
             st.stop()
 
-        # --- Format Check (Early) ---
         logger.info("Checking format of generated output.")
         format_passed, format_msg = evaluation_metrics.check_format(generated_json_str)
         evaluation_results["format_check"] = {"passed": format_passed, "message": format_msg}
@@ -326,7 +285,7 @@ if st.session_state.run_pipeline:
                 current_eval_data["generated_data"] = generated_data
                 logger.debug("Successfully parsed generated data.")
             except Exception as e:
-                format_passed = False # Override as parsing failed
+                format_passed = False
                 format_msg = f"Passed initial check but failed json.loads: {e}"
                 evaluation_results["format_check"] = {"passed": format_passed, "message": format_msg}
                 current_eval_data["generated_data"] = {"error": f"JSON Parsing Error: {e}"}
@@ -335,15 +294,12 @@ if st.session_state.run_pipeline:
             current_eval_data["generated_data"] = {"error": "Invalid JSON"}
             logger.error(f"Generated output failed format check: {format_msg}")
 
-        # --- Evaluation Stages ---
         logger.info("Starting Evaluation Stages.")
 
-        # Stage 1: Automated Checks
         logger.info("Running Stage 1: Length & BERTScore Checks.")
         stage1_start_time = time.time()
         with processing_placeholder:
             with st.spinner("Running Stage 1: Length & BERTScore Checks..."):
-                # Length Check
                 if generated_data and "error" not in generated_data:
                     length_passed, length_details = evaluation_metrics.check_length(generated_data)
                     evaluation_results["length_check"] = {"passed": length_passed, "details": length_details}
@@ -352,7 +308,6 @@ if st.session_state.run_pipeline:
                     evaluation_results["length_check"] = {"passed": False, "details": {"error": "Could not parse data for length check"}}
                     logger.warning("Skipping length check due to parsing error or no data.")
 
-                # BERTScore Check
                 summary_text = generated_data.get("summary") if generated_data and "error" not in generated_data else None
                 if summary_text:
                     bert_score_val, bert_msg = evaluation_metrics.calculate_bertscore(summary_text, st.session_state.transcript_input)
@@ -365,7 +320,6 @@ if st.session_state.run_pipeline:
         stage1_time = time.time() - stage1_start_time
         evaluation_results["stage1_time"] = stage1_time
 
-        # Stage 2: AI Judge
         logger.info("Initiating Stage 2: AI Judge Assessment.")
         stage2_start_time = time.time()
         ai_judge_assessment = {"data": None, "error": None, "raw_response": None}
@@ -405,28 +359,23 @@ if st.session_state.run_pipeline:
 
         evaluation_results["ai_judge_assessment"] = ai_judge_assessment
 
-        # Stage 3: Human Feedback (Placeholder)
         logger.info("Setting up Stage 3: Human Feedback placeholder.")
         stage3_start_time = time.time()
         evaluation_results["user_utility_rating"] = None
         stage3_time = time.time() - stage3_start_time
         evaluation_results["stage3_time"] = stage3_time
 
-        # Store results
         current_eval_data["evaluation_results"] = evaluation_results
         st.session_state.evaluation_log.append(current_eval_data)
-        st.session_state.current_run_index = len(st.session_state.evaluation_log) - 1 # Update index
+        st.session_state.current_run_index = len(st.session_state.evaluation_log) - 1
         logger.info(f"Evaluation results stored for timestamp {run_timestamp}. New log length: {len(st.session_state.evaluation_log)}")
         logger.debug(f"Full evaluation results for current run: {evaluation_results}")
 
     finally:
-        processing_placeholder.empty() # Clear the "Processing..." message
+        processing_placeholder.empty()
 
-    # Trigger a rerun to update the tabs with the new data
     st.rerun()
 
-
-# --- Create Tabs ---
 tab_config, tab_output, tab_eval, tab_log = st.tabs([
     "⚙️ Configuration & Prompts",
     "🤖 Generated Output",
@@ -434,7 +383,6 @@ tab_config, tab_output, tab_eval, tab_log = st.tabs([
     "📜 Run Log & History"
 ])
 
-# --- Populate Tab 1: Configuration & Prompts ---
 with tab_config:
     st.header("Pipeline Configuration")
     st.markdown("**Models Used:**")
@@ -460,9 +408,8 @@ with tab_config:
     with st.expander("Generator System Prompt"):
         st.text(config.SYSTEM_PROMPT_GENERATION)
     with st.expander("Generator User Prompt Template"):
-        st.text(config.USER_PROMPT_GENERATION) # Show template without filling {}
+        st.text(config.USER_PROMPT_GENERATION)
     with st.expander("AI Judge Prompt Template"):
-         # Display the template showing the placeholders correctly
          judge_prompt_display = config.AI_JUDGE_PROMPT_TEMPLATE.replace('{transcript}', '{transcript_placeholder}').replace('{generated_json_string}', '{generated_json_placeholder}')
          st.text(judge_prompt_display)
 
@@ -474,7 +421,6 @@ with tab_config:
     else:
         st.info("No transcript available. Download a transcript using the YouTube URL input in the sidebar.")
 
-# --- Populate Tab 2: Generated Output ---
 with tab_output:
     st.header("Generated Output")
     if st.session_state.current_run_index is not None:
@@ -482,7 +428,6 @@ with tab_output:
         gen_data = current_data.get("generated_data")
         gen_error = current_data.get("generator_error")
         format_error = not current_data.get("evaluation_results", {}).get("format_check", {}).get("passed", True) if current_data.get("evaluation_results") else False
-
 
         if gen_error:
              st.error(f"Generation failed: {gen_error}")
@@ -507,8 +452,6 @@ with tab_output:
     else:
         st.info("Run the pipeline using the sidebar to view generated output here.")
 
-
-# --- Populate Tab 3: Evaluation Results ---
 with tab_eval:
     st.header("Evaluation Results for Last Run")
 
@@ -516,12 +459,10 @@ with tab_eval:
         current_data = st.session_state.evaluation_log[st.session_state.current_run_index]
         eval_results = current_data.get("evaluation_results")
 
-        # Display the detailed metrics using the helper function
         display_evaluation_results(eval_results)
 
         st.divider()
 
-        # --- Human Feedback Input for the CURRENT run ---
         st.subheader("⭐ Provide Human Feedback (Utility)")
         st.caption("Rate how useful you found the generated summary and flashcards for *this specific run*.")
 
@@ -529,11 +470,10 @@ with tab_eval:
         rating_key = f"rating_{current_data['timestamp']}"
         submit_key = f"submit_{current_data['timestamp']}"
 
-        # Check if rating already submitted
         rating_already_submitted = eval_results.get("user_utility_rating") is not None
 
         user_rating = st.slider("Your Rating (1=Not Useful, 5=Very Useful):",
-                                min_value=1, max_value=5, value=eval_results.get("user_utility_rating", 3), # Default to 3 or existing rating
+                                min_value=1, max_value=5, value=eval_results.get("user_utility_rating", 3),
                                 key=rating_key,
                                 disabled=rating_already_submitted)
 
@@ -541,23 +481,18 @@ with tab_eval:
             st.session_state.evaluation_log[current_log_index]["evaluation_results"]["user_utility_rating"] = user_rating
             logger.info(f"User submitted rating: {user_rating} for log index {current_log_index} (Timestamp: {current_data['timestamp']})")
             st.success(f"Rating ({user_rating}) submitted for Run ID {current_log_index + 1}!")
-            # Rerun to update the display and disable the widget
             st.rerun()
     else:
          st.info("Run the pipeline using the sidebar to view evaluation results here.")
 
-
-# --- Populate Tab 4: Run Log & History ---
 with tab_log:
     st.header("📜 Run Log & History")
     st.caption("History of pipeline runs in this session.")
 
     if st.session_state.evaluation_log:
-        # Prepare data for display
         log_display_data = []
-        for i, entry in enumerate(reversed(st.session_state.evaluation_log)): # Show newest first
+        for i, entry in enumerate(reversed(st.session_state.evaluation_log)):
             eval_res = entry.get("evaluation_results", {})
-            # Use .get chains for safe access
             ai_res_data = eval_res.get("ai_judge_assessment", {}).get("data", {})
             acc_data = ai_res_data.get("accuracy_assessment", {}) if ai_res_data else {}
             bert_data = eval_res.get("bert_score", {})
@@ -571,7 +506,6 @@ with tab_log:
             if gen_error: status = "Generator Error"
             elif not format_data.get("passed"): status = "Format Error"
             elif judge_error and "Skipped" not in judge_error: status = "AI Judge Error"
-
 
             log_item = {
                 "ID": len(st.session_state.evaluation_log) - i,
@@ -591,7 +525,6 @@ with tab_log:
 
         st.dataframe(pd.DataFrame(log_display_data))
 
-        # Option to show details for a specific log entry
         log_ids = [item['ID'] for item in log_display_data]
         if log_ids:
             selected_id = st.selectbox("Select Log ID to view details:", options=log_ids, index=0, key="log_selector_detail")
@@ -602,7 +535,6 @@ with tab_log:
                         selected_entry = st.session_state.evaluation_log[selected_entry_index]
                         st.subheader(f"Details for Log ID: {selected_id}")
                         logger.debug(f"Displaying details for Log ID {selected_id}")
-                        # Use columns for better layout of details
                         col_detail1, col_detail2 = st.columns(2)
                         with col_detail1:
                              with st.expander("Show Transcript"):
@@ -611,7 +543,6 @@ with tab_log:
                              with st.expander("Show Generated Raw JSON"):
                                  st.text_area("Generated Raw JSON", selected_entry.get("generated_json_str", "N/A"), height=200, disabled=True, key=f"detail_rawjson_{selected_id}")
 
-                        # Display evaluation results using the helper function
                         display_evaluation_results(selected_entry.get("evaluation_results", {}))
                     else:
                         st.error(f"Invalid selected log index: {selected_entry_index}")
@@ -620,12 +551,9 @@ with tab_log:
                      st.error(f"Error displaying log details: {e}")
                      logger.error(f"Error displaying log details for ID {selected_id}: {e}", exc_info=True)
 
-
-        # Option to show raw log data
         with st.expander("Show Full Raw Session Log Data (JSON)"):
             st.json(st.session_state.evaluation_log)
     else:
         st.info("Run the pipeline using the sidebar to see logs here.")
-
 
 logger.info("--- Streamlit App Re-Render Complete ---")
